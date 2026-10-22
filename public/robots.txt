@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /kuldes.php
+Disallow: /koszonjuk/
+
+Sitemap: https://emcremdefibrillator.hu/sitemap.xml
