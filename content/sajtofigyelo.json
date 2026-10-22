@@ -1,0 +1,94 @@
+[
+  {
+    "date": "2021-10-28",
+    "title": "Mentőhívás, AED, felmérés",
+    "summary": "Felmérés a mentőhívásról, az újraélesztésről és a laikus elsősegélynyújtásról.",
+    "links": [
+      {
+        "label": "index.hu",
+        "url": "https://index.hu/belfold/2021/10/05/mento-eletmentes-elsosegely-ujraelesztes-felmeres/"
+      }
+    ]
+  },
+  {
+    "date": "2021-10-28",
+    "title": "AED az életben! – Defibrillátorral mentettek életet egy debreceni tornateremben",
+    "summary": "Valós eset arról, hogy egy helyben elérhető defibrillátor életet ment.",
+    "links": [
+      {
+        "label": "haon.hu",
+        "url": "https://haon.hu/kek-hirek/helyi-kek-hirek/defibrillatorral-mentettek-eletet-egy-debreceni-tornateremben-5771540/"
+      }
+    ]
+  },
+  {
+    "date": "2021-07-18",
+    "title": "Életmentő szülők",
+    "summary": "Videó a laikus újraélesztésről.",
+    "links": [
+      {
+        "label": "YouTube-videó",
+        "url": "https://www.youtube.com/watch?v=Jw5z_3dnisU&t=315s"
+      }
+    ]
+  },
+  {
+    "date": "2020-11-08",
+    "title": "COVID napló – avagy ez történt, miután pozitív lett a tesztem",
+    "summary": "Személyes beszámoló egy orvostanhallgató tollából.",
+    "links": [
+      {
+        "label": "orvostanhallgato.com",
+        "url": "http://orvostanhallgato.com/2020/11/08/covid-naplo-avagy-ez-tortent-miutan-pozitiv-lett-a-tesztem/"
+      }
+    ]
+  },
+  {
+    "date": "2020-10-15",
+    "title": "Ne parázz, sokkolj!",
+    "summary": "Videó az automata defibrillátor használatáról.",
+    "links": [
+      {
+        "label": "YouTube-videó",
+        "url": "https://www.youtube.com/watch?v=EgFhnGPjnLI"
+      }
+    ]
+  },
+  {
+    "date": "2020-07-21",
+    "title": "Defibrillation (angol nyelvű)",
+    "summary": "A defibrilláció története és működése.",
+    "links": [
+      {
+        "label": "Wikipedia",
+        "url": "https://en.wikipedia.org/wiki/Defibrillation#History"
+      }
+    ]
+  },
+  {
+    "date": "2020-07-21",
+    "title": "Defibrillátor – mikor és hogyan kell használni?",
+    "summary": "Gyakorlati útmutató a defibrillátor használatáról.",
+    "links": [
+      {
+        "label": "WEBBeteg",
+        "url": "https://www.webbeteg.hu/cikkek/elsosegely/6757/defibrillator"
+      },
+      {
+        "label": "Élethosszig",
+        "url": "https://elethosszig.hu/defibrillator-eletet-menthet/"
+      }
+    ]
+  },
+  {
+    "date": "2020-07-21",
+    "title": "Hirtelen szívhalál, automata defibrillátor",
+    "summary": "Tájékoztató a hirtelen szívhalálról és az AED szerepéről.",
+    "links": [
+      {
+        "label": "mnsza.hu",
+        "url": "http://www.mnsza.hu/hirtelen/index.php"
+      }
+    ]
+  }
+]

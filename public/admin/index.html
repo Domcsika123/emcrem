@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sajtófigyelő szerkesztő | Emcrem admin</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="../favicon.ico" sizes="48x48">
+<link rel="stylesheet" href="../assets/css/style.css">
+<link rel="stylesheet" href="admin.css">
+</head>
+<body class="admin">
+<header class="admin-bar">
+  <div class="container admin-bar__inner">
+    <a class="admin-brand" href="../"><img src="../assets/img/emcrem-logo.png" width="409" height="113" alt="Emcrem – vissza a weboldalra"></a>
+    <span class="admin-bar__title">Sajtófigyelő szerkesztő</span>
+    <nav class="admin-bar__actions" aria-label="Admin">
+      <a id="view-site" href="../erdekes-linkek-sajtofigyelo/" target="_blank" rel="noopener">Megnézem az oldalon ↗</a>
+      <button id="logout" class="admin-link-btn" type="button" hidden>Kijelentkezés</button>
+    </nav>
+  </div>
+</header>
+
+<main class="container admin-main">
+  <div id="status" class="admin-status" role="status" aria-live="polite" hidden></div>
+
+  <!-- 1. Belépés -->
+  <section id="connect" class="admin-panel" hidden aria-labelledby="connect-title">
+    <h1 id="connect-title">Belépés</h1>
+    <p class="text-muted">A szerkesztő a weboldal GitHub-tárhelyére menti a változásokat. Ehhez egyszer létre kell hoznod egy belépőkulcsot (tokent), ami csak ehhez az egy repóhoz ad hozzáférést.</p>
+
+    <details class="admin-help" id="token-help">
+      <summary>Hogyan hozok létre kulcsot? (kb. 1 perc, csak egyszer kell)</summary>
+      <ol class="admin-steps">
+        <li>Nyisd meg ezt az oldalt (GitHub-belépés kellhet): <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener"><strong>Új kulcs létrehozása ↗</strong></a></li>
+        <li><strong>Token name:</strong> pl. <code>Emcrem admin</code> · <strong>Expiration:</strong> pl. 1 év</li>
+        <li><strong>Repository access:</strong> <em>Only select repositories</em> → válaszd ki: <code><span data-repo>emcrem</span></code></li>
+        <li><strong>Permissions → Repository permissions:</strong>
+          <ul>
+            <li><strong>Contents:</strong> <em>Read and write</em> (kötelező)</li>
+            <li><strong>Actions:</strong> <em>Read-only</em> (ajánlott – így látod, mikor került ki az oldalra)</li>
+          </ul>
+        </li>
+        <li>Kattints a <strong>Generate token</strong> gombra, másold ki a kulcsot (<code>github_pat_…</code>), és illeszd be lent.</li>
+      </ol>
+    </details>
+
+    <form id="connect-form" class="admin-form" novalidate>
+      <div class="field">
+        <label for="token">Belépőkulcs (token)</label>
+        <input id="token" name="token" type="password" autocomplete="off" spellcheck="false" placeholder="github_pat_…" required>
+      </div>
+      <label class="checkbox"><input id="remember" type="checkbox" checked><span>Emlékezzen rám ezen az eszközön</span></label>
+      <button class="btn btn--primary" type="submit">Belépés</button>
+    </form>
+  </section>
+
+  <!-- 2. Szerkesztő -->
+  <section id="app" hidden aria-labelledby="app-title">
+    <div class="admin-head">
+      <div>
+        <h1 id="app-title">Sajtófigyelő</h1>
+        <p class="text-muted mb-0">Az itt felvett cikkek és videók megjelennek az <a href="../erdekes-linkek-sajtofigyelo/" target="_blank" rel="noopener">Érdekes linkek</a> oldalon, a legújabb három a kezdőlapon is.</p>
+      </div>
+      <button id="new-btn" class="btn btn--primary" type="button">+ Új bejegyzés</button>
+    </div>
+
+    <form id="editor" class="admin-panel admin-editor" hidden novalidate aria-labelledby="editor-title">
+      <h2 id="editor-title">Új bejegyzés</h2>
+      <div class="admin-editor__grid">
+        <div class="admin-editor__fields">
+          <div class="field">
+            <label for="f-url">Link <span class="req" aria-hidden="true">*</span></label>
+            <input id="f-url" type="url" inputmode="url" placeholder="Illeszd be a cikk vagy videó címét: https://…" required>
+            <p class="admin-hint">Másold ki a böngésző címsorából, és illeszd be ide.</p>
+          </div>
+          <div class="field">
+            <label for="f-title">Cím <span class="req" aria-hidden="true">*</span></label>
+            <input id="f-title" type="text" maxlength="160" placeholder="pl. Defibrillátorral mentettek életet egy tornateremben" required>
+          </div>
+          <div class="field">
+            <label for="f-summary">Rövid leírás <span class="hint">(nem kötelező, 1 mondat)</span></label>
+            <textarea id="f-summary" maxlength="240" rows="2" placeholder="Miről szól röviden?"></textarea>
+          </div>
+          <div class="admin-row">
+            <div class="field">
+              <label for="f-date">Dátum <span class="req" aria-hidden="true">*</span></label>
+              <input id="f-date" type="date" required>
+            </div>
+            <div class="field">
+              <label for="f-label">Forrás neve</label>
+              <input id="f-label" type="text" maxlength="40" placeholder="automatikus">
+            </div>
+          </div>
+
+          <div id="second-link" class="admin-second" hidden>
+            <div class="admin-row">
+              <div class="field">
+                <label for="f-url2">Második link</label>
+                <input id="f-url2" type="url" inputmode="url" placeholder="https://…">
+              </div>
+              <div class="field">
+                <label for="f-label2">Forrás neve</label>
+                <input id="f-label2" type="text" maxlength="40" placeholder="automatikus">
+              </div>
+            </div>
+            <button id="remove-second" class="admin-link-btn" type="button">Második link eltávolítása</button>
+          </div>
+          <button id="add-second" class="admin-link-btn" type="button">+ Második link hozzáadása</button>
+
+          <p id="editor-error" class="admin-error" role="alert" hidden></p>
+          <div class="admin-actions">
+            <button id="save-btn" class="btn btn--primary" type="submit">Közzététel</button>
+            <button id="cancel-btn" class="btn btn--secondary" type="button">Mégse</button>
+          </div>
+        </div>
+
+        <aside class="admin-preview" aria-label="Előnézet">
+          <p class="admin-preview__label">Így fog megjelenni:</p>
+          <ul class="press-list"><li class="press-item" id="preview"></li></ul>
+        </aside>
+      </div>
+    </form>
+
+    <h2 class="admin-list-title">Megjelent bejegyzések <span id="count" class="text-muted"></span></h2>
+    <ul id="list" class="admin-list"></ul>
+  </section>
+</main>
+
+<script src="admin.js"></script>
+</body>
+</html>

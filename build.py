@@ -299,7 +299,7 @@ def page(path, title, desc, body, current=None, schema=None, noindex=False,
         {"@type": page_type, "@id": url + "#webpage", "url": url, "name": title, "description": desc,
          "inLanguage": "hu-HU", "isPartOf": {"@id": SITE + "/#website"}, "about": {"@id": SITE + "/#org"}},
     ] + (schema or [])
-    ld = json.dumps({"@context": "https://schema.org", "@graph": graph}, ensure_ascii=False, indent=1)
+    ld = json.dumps({"@context": "https://schema.org", "@graph": graph}, ensure_ascii=False, indent=1).replace("<", "\\u003c")
     robots = "noindex, follow" if noindex else "index, follow, max-image-preview:large"
     doc = f'''<!doctype html>
 <html lang="hu">
@@ -346,7 +346,7 @@ def page(path, title, desc, body, current=None, schema=None, noindex=False,
     if path.endswith(".html"):
         out = ROOT / path.strip("/")
     out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text(with_base(doc), encoding="utf-8")
+    out.write_text(with_base(doc), encoding="utf-8", newline="\n")
     return path, noindex
 
 
@@ -412,25 +412,32 @@ def faq_block(items, heading_id="gyik-cim", title="Gyakori kérdések", soft=Tru
 # ---------------------------------------------------------------------------
 # Tartalom
 # ---------------------------------------------------------------------------
-PRESS = [
-    ("2021-10-28", "Mentőhívás, AED, felmérés", "Felmérés a mentőhívásról, az újraélesztésről és a laikus elsősegélynyújtásról.",
-     [("index.hu", "https://index.hu/belfold/2021/10/05/mento-eletmentes-elsosegely-ujraelesztes-felmeres/", "news")]),
-    ("2021-10-28", "AED az életben! – Defibrillátorral mentettek életet egy debreceni tornateremben", "Valós eset arról, hogy egy helyben elérhető defibrillátor életet ment.",
-     [("haon.hu", "https://haon.hu/kek-hirek/helyi-kek-hirek/defibrillatorral-mentettek-eletet-egy-debreceni-tornateremben-5771540/", "news")]),
-    ("2021-07-18", "Életmentő szülők", "Videó a laikus újraélesztésről.",
-     [("YouTube-videó", "https://www.youtube.com/watch?v=Jw5z_3dnisU&t=315s", "play")]),
-    ("2020-11-08", "COVID napló – avagy ez történt, miután pozitív lett a tesztem", "Személyes beszámoló egy orvostanhallgató tollából.",
-     [("orvostanhallgato.com", "http://orvostanhallgato.com/2020/11/08/covid-naplo-avagy-ez-tortent-miutan-pozitiv-lett-a-tesztem/", "news")]),
-    ("2020-10-15", "Ne parázz, sokkolj!", "Videó az automata defibrillátor használatáról.",
-     [("YouTube-videó", "https://www.youtube.com/watch?v=EgFhnGPjnLI", "play")]),
-    ("2020-07-21", "Defibrillation (angol nyelvű)", "A defibrilláció története és működése.",
-     [("Wikipedia", "https://en.wikipedia.org/wiki/Defibrillation#History", "globe")]),
-    ("2020-07-21", "Defibrillátor – mikor és hogyan kell használni?", "Gyakorlati útmutató a defibrillátor használatáról.",
-     [("WEBBeteg", "https://www.webbeteg.hu/cikkek/elsosegely/6757/defibrillator", "news"),
-      ("Élethosszig", "https://elethosszig.hu/defibrillator-eletet-menthet/", "news")]),
-    ("2020-07-21", "Hirtelen szívhalál, automata defibrillátor", "Tájékoztató a hirtelen szívhalálról és az AED szerepéről.",
-     [("mnsza.hu", "http://www.mnsza.hu/hirtelen/index.php", "news")]),
-]
+PRESS_FILE = Path(__file__).parent / "content" / "sajtofigyelo.json"
+
+
+def link_icon(url):
+    host = url.split("/")[2].lower() if "//" in url else ""
+    if "youtube." in host or "youtu.be" in host:
+        return "play"
+    if "wikipedia." in host:
+        return "globe"
+    return "news"
+
+
+def load_press():
+    """Sajtófigyelő bejegyzések a content/sajtofigyelo.json fájlból (ezt szerkeszti az /admin/ felület)."""
+    items = []
+    for it in json.loads(PRESS_FILE.read_text(encoding="utf-8")):
+        date = str(it.get("date", ""))
+        title = str(it.get("title", "")).strip()
+        links = [(str(l.get("label") or "").strip() or l["url"].split("/")[2], l["url"], link_icon(l["url"]))
+                 for l in it.get("links", []) if re.match(r"^https?://[^\s/]+", str(l.get("url", "")))]
+        if re.match(r"^\d{4}-\d{2}-\d{2}$", date) and title and links:
+            items.append((date, title, str(it.get("summary", "")).strip(), links))
+    return sorted(items, key=lambda x: x[0], reverse=True)
+
+
+PRESS = load_press()
 
 
 def hu_date(iso):
@@ -441,13 +448,14 @@ def press_items(items, heading="h2"):
     out = []
     for d, title, summary, links in items:
         ls = "".join(
-            f'<a class="press-link" href="{u}" target="_blank" rel="noopener">{lbl} {icon("external")}'
+            f'<a class="press-link" href="{esc(u)}" target="_blank" rel="noopener">{esc(lbl)} {icon("external")}'
             f'<span class="visually-hidden"> (új lapon nyílik)</span></a>' for lbl, u, ic in links)
-        out.append(f'''<li class="press-item">
+        summary_html = f"<p>{esc(summary)}</p>" if summary else ""
+        out.append(f"""<li class="press-item">
   <time datetime="{d}">{hu_date(d)}</time>
-  <div><{heading}>{title}</{heading}><p>{summary}</p></div>
+  <div><{heading}>{esc(title)}</{heading}>{summary_html}</div>
   <div class="press-links">{ls}</div>
-</li>''')
+</li>""")
     return f'<ul class="press-list">{"".join(out)}</ul>'
 
 
@@ -1087,14 +1095,14 @@ def write_static(pages):
     for u in urls:
         sm.append(f"  <url><loc>{SITE}{u}</loc><lastmod>{LASTMOD}</lastmod><priority>{prio.get(u, '0.7')}</priority></url>")
     sm.append("</urlset>")
-    (ROOT / "sitemap.xml").write_text("\n".join(sm) + "\n", encoding="utf-8")
+    (ROOT / "sitemap.xml").write_text("\n".join(sm) + "\n", encoding="utf-8", newline="\n")
     (ROOT / "robots.txt").write_text(
-        f"User-agent: *\nAllow: /\nDisallow: /kuldes.php\nDisallow: /koszonjuk/\n\nSitemap: {SITE}/sitemap.xml\n", encoding="utf-8")
+        f"User-agent: *\nAllow: /\nDisallow: /kuldes.php\nDisallow: /koszonjuk/\nDisallow: /admin/\n\nSitemap: {SITE}/sitemap.xml\n", encoding="utf-8", newline="\n")
     (ROOT / "site.webmanifest").write_text(json.dumps({
         "name": "Emcrem defibrillátor", "short_name": "Emcrem", "lang": "hu",
         "icons": [{"src": BASE + "icon-192.png", "sizes": "192x192", "type": "image/png"}],
         "theme_color": "#0b1d36", "background_color": "#ffffff", "display": "browser", "start_url": BASE},
-        ensure_ascii=False, indent=2), encoding="utf-8")
+        ensure_ascii=False, indent=2), encoding="utf-8", newline="\n")
 
 
 if __name__ == "__main__":
