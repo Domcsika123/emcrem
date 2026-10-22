@@ -235,7 +235,7 @@ strong { font-weight: 700; color: var(--navy-900); }
 .hero-visual { position: relative; max-width: min(500px, 58vh); margin-inline: auto; width: 100%; }
 .hero-visual__img { position: relative; aspect-ratio: 1; border-radius: 50%; background: #fff; overflow: hidden; }
 .hero-visual__img img { width: 100%; height: 100%; object-fit: cover; }
-@media (max-width: 959px) { .hero-visual { max-width: min(360px, 78vw); } }
+@media (max-width: 959px) { .hero-visual { max-width: min(360px, 78vw); order: -1; } }
 
 /* ---------- Grids ---------- */
 .grid { display: grid; gap: clamp(28px, 3vw, 40px); }
@@ -534,3 +534,62 @@ a.tag:hover { text-decoration: underline; }
 .statement { max-width: 760px; margin: 0 auto; padding-block: clamp(24px, 4.5vh, 40px); border-block: 1px solid var(--line); text-align: center;
   font-size: clamp(1.1rem, min(.95rem + .7vw, 3vh), 1.45rem); line-height: 1.55; font-weight: 500; color: var(--ink); text-wrap: balance; }
 .statement em { font-style: normal; font-weight: 600; color: var(--brand-600); white-space: nowrap; }
+
+/* ---------- Mobile refinements ---------- */
+@media (max-width: 639px) {
+  :root { --space-section: clamp(40px, 6vh, 56px); --space-tight: 32px; }
+  body { font-size: 1rem; }
+
+  /* full-width, equal buttons instead of ragged stacks */
+  .btn-row { flex-direction: column; align-items: stretch; gap: 10px; }
+  .btn-row .btn { width: 100%; }
+  .price-box--cta .btn { width: 100%; }
+
+  /* hero: smaller product shot so the message stays on screen */
+  .hero { padding-block: 24px 32px; }
+  .hero-grid { gap: 24px; }
+  .hero-visual { max-width: min(230px, 62vw); }
+  .hero-points { flex-direction: column; gap: 6px; }
+
+  /* service teasers: compact list (thumbnail + text) */
+  .grid--4 { gap: 0; border-bottom: 1px solid var(--line); }
+  .card { flex-direction: row; align-items: flex-start; gap: 14px; padding-block: 14px; border-top: 1px solid var(--line); }
+  .card__media, .card--link .card__media { flex: none; width: 96px; aspect-ratio: 1; border-radius: var(--radius-sm); }
+  .card__body { padding-top: 0; }
+  .card__body h3 { font-size: 1.05rem; margin-bottom: 4px; }
+  .card__body p { font-size: .9063rem; line-height: 1.5; margin: 0; }
+  .card__body .link-arrow { display: none; }
+
+  /* images inside sections: no full-screen photos */
+  .media-frame img { max-height: 240px; }
+  .media-frame--product img { max-height: 260px; }
+  .page-hero__media img { aspect-ratio: 16 / 9; max-height: 220px; }
+  .gallery__main { max-height: 300px; }
+  .split { gap: 24px; }
+
+  .partners { gap: 20px 32px; }
+  .partner img { max-height: 28px; }
+
+  .statement { padding-block: 22px; }
+  .faq summary { font-size: 1rem; }
+  .info-card__value small a { white-space: nowrap; }
+
+  /* footer: link lists side by side */
+  .footer-grid { grid-template-columns: 1fr 1fr; gap: 28px 20px; }
+  .footer-brand, .footer-grid > div:last-child { grid-column: 1 / -1; }
+  .footer-brand img { width: 130px; margin-bottom: 14px; }
+  .footer-bottom { flex-direction: column; }
+}
+
+/* Mobile hero: image takes only the height left after the text, so both buttons are visible on load */
+@media (max-width: 639px) {
+  .hero { padding-block: 12px 28px; }
+  .hero-grid { gap: 12px; }
+  .hero-visual { width: clamp(96px, calc(100svh - 480px), 230px); }
+  .hero .eyebrow { font-size: .75rem; margin-bottom: 6px; }
+  .hero h1 { font-size: clamp(1.6rem, 7.2vw, 2rem); margin-bottom: 10px; }
+  .hero .lead { font-size: .9688rem; line-height: 1.55; margin-bottom: 16px; }
+  .hero .btn-row { gap: 8px; }
+  .hero .btn { min-height: 46px; padding-block: 10px; }
+}
+@media (max-width: 639px) and (max-height: 620px) { .hero .eyebrow { display: none; } }
