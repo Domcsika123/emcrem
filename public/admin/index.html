@@ -7,7 +7,7 @@
 <meta name="robots" content="noindex, nofollow">
 <link rel="icon" href="../favicon.ico" sizes="48x48">
 <link rel="stylesheet" href="../assets/css/style.css">
-<link rel="stylesheet" href="admin.css">
+<link rel="stylesheet" href="admin.css?v=3">
 </head>
 <body class="admin">
 <header class="admin-bar">
@@ -27,32 +27,26 @@
   <!-- 1. Belépés -->
   <section id="connect" class="admin-panel" hidden aria-labelledby="connect-title">
     <h1 id="connect-title">Belépés</h1>
-    <p class="text-muted">A szerkesztő a weboldal GitHub-tárhelyére menti a változásokat. Ehhez egyszer létre kell hoznod egy belépőkulcsot (tokent), ami csak ehhez az egy repóhoz ad hozzáférést.</p>
-
-    <details class="admin-help" id="token-help">
-      <summary>Hogyan hozok létre kulcsot? (kb. 1 perc, csak egyszer kell)</summary>
-      <ol class="admin-steps">
-        <li>Nyisd meg ezt az oldalt (GitHub-belépés kellhet): <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener"><strong>Új kulcs létrehozása ↗</strong></a></li>
-        <li><strong>Token name:</strong> pl. <code>Emcrem admin</code> · <strong>Expiration:</strong> pl. 1 év</li>
-        <li><strong>Repository access:</strong> <em>Only select repositories</em> → válaszd ki: <code><span data-repo>emcrem</span></code></li>
-        <li><strong>Permissions → Repository permissions:</strong>
-          <ul>
-            <li><strong>Contents:</strong> <em>Read and write</em> (kötelező)</li>
-            <li><strong>Actions:</strong> <em>Read-only</em> (ajánlott – így látod, mikor került ki az oldalra)</li>
-          </ul>
-        </li>
-        <li>Kattints a <strong>Generate token</strong> gombra, másold ki a kulcsot (<code>github_pat_…</code>), és illeszd be lent.</li>
-      </ol>
-    </details>
+    <p class="text-muted">Illeszd be a weboldal készítőjétől kapott belépőkulcsot. Ezen az eszközön elég egyszer megadni, utána a szerkesztő magától megnyílik.</p>
 
     <form id="connect-form" class="admin-form" novalidate>
       <div class="field">
-        <label for="token">Belépőkulcs (token)</label>
+        <label for="token">Belépőkulcs</label>
         <input id="token" name="token" type="password" autocomplete="off" spellcheck="false" placeholder="github_pat_…" required>
+        <p class="admin-hint">Hosszú, <code>github_pat_</code> kezdetű szöveg. Másold ki egészben, és illeszd be ide (Ctrl+V).</p>
       </div>
       <label class="checkbox"><input id="remember" type="checkbox" checked><span>Emlékezzen rám ezen az eszközön</span></label>
       <button class="btn btn--primary" type="submit">Belépés</button>
     </form>
+
+    <details class="admin-help">
+      <summary>Nem működik a kulcs, vagy új eszközről lépnél be?</summary>
+      <ul class="admin-steps">
+        <li>Új számítógépen, telefonon vagy a böngészőadatok törlése után a kulcsot újra be kell illeszteni – ezért őrizd meg biztos helyen (pl. jelszókezelőben).</li>
+        <li>A kulcsot ne add tovább és ne küldd el másnak: aki ismeri, az szerkeszteni tudja a weboldal tartalmát.</li>
+        <li>Ha elveszett, lejárt, vagy illetéktelen kézbe került, kérj újat a weboldal készítőjétől – a régit ő le tudja tiltani.</li>
+      </ul>
+    </details>
   </section>
 
   <!-- 2. Szerkesztő -->
@@ -82,10 +76,12 @@
             <label for="f-summary">Rövid leírás <span class="hint">(nem kötelező, 1 mondat)</span></label>
             <textarea id="f-summary" maxlength="240" rows="2" placeholder="Miről szól röviden?"></textarea>
           </div>
-          <fieldset class="field admin-choice">
+          <fieldset class="admin-choice">
             <legend>Kinek szól? <span class="req" aria-hidden="true">*</span></legend>
-            <label class="admin-choice__opt"><input type="radio" name="group" value="mindenkinek" checked><span><strong>Mindenkinek</strong> laikusoknak is érthető</span></label>
-            <label class="admin-choice__opt"><input type="radio" name="group" value="szakmai"><span><strong>Szakmai</strong> egészségügyi szakembereknek</span></label>
+            <div class="admin-choice__grid">
+              <label class="admin-choice__opt"><input type="radio" name="group" value="mindenkinek" checked><span class="admin-choice__dot" aria-hidden="true"></span><span class="admin-choice__text"><strong>Mindenkinek</strong>Laikusoknak is érthető</span></label>
+              <label class="admin-choice__opt"><input type="radio" name="group" value="szakmai"><span class="admin-choice__dot" aria-hidden="true"></span><span class="admin-choice__text"><strong>Szakmai</strong>Egészségügyi szakembereknek</span></label>
+            </div>
           </fieldset>
           <div class="admin-row">
             <div class="field">
@@ -132,6 +128,6 @@
   </section>
 </main>
 
-<script src="admin.js"></script>
+<script src="admin.js?v=3"></script>
 </body>
 </html>

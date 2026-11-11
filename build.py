@@ -51,11 +51,10 @@ IMGS = {
     "aed-3100-nyitott-fedellel": (800, 800, [800, 480]),
     "aed-3100-hordtaska": (800, 800, [800, 480]),
     "aed-fali-tarolo-szekreny": (800, 800, [800, 480]),
-    "aed-3100-elektrodakkal": (619, 349, [619]),
+    "aed-3100-elektrodakkal": (1712, 624, [1712, 1200, 800]),
     "aed-3100-gyermek-paciensek": (706, 397, [706]),
-    "aed-fali-tarolo-sportletesitmenyben": (346, 195, [346]),
-    "aed-kerek-fali-tarolo": (310, 310, [310]),
-    "cardiolife-ems-mentoben": (607, 342, [607]),
+    "aed-3100-kerek-fali-taroloban": (750, 694, [750, 480]),
+    "cardiolife-ems-mentoben": (1712, 624, [1712, 1200, 800]),
     "munkahelyi-elsosegely-oktatas": (500, 334, [500]),
     "automata-defibrillator-csalad": (500, 257, [500]),
     "oktatas-extrak": (500, 449, [500]),
@@ -527,7 +526,7 @@ def build_home():
   <div class="container hero-split__grid">
     <a class="hero-split__switch" href="#szakmai">{icon("steth")} Szakmai felhasználóknak {icon("chevron")}</a>
     <article class="hero-card" aria-labelledby="hero-cim">
-      <a class="hero-card__media" href="/automata-defibrillator/" tabindex="-1" aria-hidden="true">{img("aed-3100-elektrodakkal", "", "(min-width: 960px) 580px, 100vw", eager=True)}</a>
+      <a class="hero-card__media" href="/automata-defibrillator/" tabindex="-1" aria-hidden="true">{img("aed-3100-elektrodakkal", "", "(min-width: 760px) 584px, 100vw", eager=True)}</a>
       <p class="eyebrow">Mindenkinek · AED Japánból</p>
       <h1 id="hero-cim">Automata defibrillátor és <span class="accent">elsősegély-oktatás</span> egy helyen</h1>
       <p class="hero-card__lead">Nihon Kohden AED-3100 üzemkészen, valamint gyakorlatorientált munkahelyi és iskolai elsősegély-oktatás.</p>
@@ -538,7 +537,7 @@ def build_home():
       <nav class="hero-card__links" aria-label="Laikus felhasználóknak">{public_chips}</nav>
     </article>
     <article class="hero-card hero-card--pro" id="szakmai" aria-labelledby="szakmai-hero-cim">
-      <a class="hero-card__media" href="/szakmai-felhasznaloknak/" tabindex="-1" aria-hidden="true">{img("cardiolife-ems-mentoben", "", "(min-width: 960px) 580px, 100vw", eager=True)}</a>
+      <a class="hero-card__media" href="/szakmai-felhasznaloknak/" tabindex="-1" aria-hidden="true">{img("cardiolife-ems-mentoben", "", "(min-width: 760px) 584px, 100vw", eager=True)}</a>
       <p class="eyebrow">Prehospitális · Kórházi</p>
       <h2 id="szakmai-hero-cim">Szakmai felhasználóknak</h2>
       <p class="hero-card__lead">Professzionális újraélesztési eszközök mentőszolgálatok, kórházak és egészségügyi intézmények számára.</p>
@@ -651,8 +650,7 @@ def build_aed():
         ("aed-3100-gyermek-paciensek", "AED-3100 – gyermek páciensek esetén is használható"),
         ("aed-3100-made-in-japan", "AED-3100 – Made in Japan"),
         ("aed-fali-tarolo-szekreny", "AED fali tárolószekrény ajtónyitásra megszólaló riasztóval"),
-        ("aed-fali-tarolo-sportletesitmenyben", "AED kerek fali tárolóban egy sportlétesítményben"),
-        ("aed-kerek-fali-tarolo", "Kerek, átlátszó fedelű AED fali tároló"),
+        ("aed-3100-kerek-fali-taroloban", "AED-3100 kerek, átlátszó fedelű fali tárolóban"),
     ], "AED-3100 termékképek")
     specs = [
         ("users", "Felnőtt és gyermek páciensekhez"),
@@ -887,7 +885,7 @@ def build_pro():
                           "EKG, SpO₂, kapnográfia, NIBP és 18 elvezetéses EKG (synECi18)",
                           "Manuális és AED mód, szinkronizált kardioverzió, külső pacemaker"),
                  gallery([("cardiolife-ems-1052-elolnezet", "Nihon Kohden cardiolife EMS-1052 monitor-defibrillátor elölnézetből"),
-                          ("cardiolife-ems-mentoben", "cardiolife EMS hordágyon, a sürgősségi osztály bejárata előtt"),
+                          ("cardiolife-ems-mentoben", "cardiolife EMS a sürgősségi osztály bejárata előtt, a háttérben mentőautóval"),
                           ("cardiolife-ems-1052-oldalnezet", "cardiolife EMS-1052 oldalnézetből, hordtáskában"),
                           ("cardiolife-ems-1052-hatulnezet", "cardiolife EMS-1052 hátulnézetből, vállpánttal")], "cardiolife EMS képek"),
                  "https://eu.nihonkohden.com/products/resuscitation/cardiolife-ems")

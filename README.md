@@ -12,9 +12,11 @@
 - Cím: https://domcsika123.github.io/emcrem/admin/ (saját domainen: `/admin/`)
 - Új cikk / videó felvétele, szerkesztése, törlése pár kattintással; előnézettel. A „Közzététel” a
   `content/sajtofigyelo.json` fájlt menti a repóba, amire a GitHub Pages pár percen belül frissül.
-- Belépés: egyszer kell egy GitHub *fine-grained* token (Settings → Developer settings → Fine-grained tokens),
-  csak az `emcrem` repóhoz, **Contents: Read and write** (+ **Actions: Read-only**, hogy látszódjon a közzététel állapota).
-  A token csak a böngészőben tárolódik; a „Kijelentkezés” törli.
+- Belépés: a szerkesztő (ügyfél) a fejlesztőtől kapott belépőkulcsot illeszti be; a belépő oldal ezt kéri.
+  A kulcs egy GitHub *fine-grained* token, amit a repó tulajdonosa hoz létre
+  (https://github.com/settings/personal-access-tokens/new): **Only select repositories → `emcrem`**,
+  **Contents: Read and write** + **Actions: Read-only** (ettől látszik a közzététel állapota), a lejárat tetszőleges.
+  A token csak a böngészőben tárolódik; a „Kijelentkezés” törli. Elvesztés esetén a GitHubon visszavonható, és új adható ki.
 - A bejegyzések a `content/sajtofigyelo.json` fájlban vannak; kézzel is szerkeszthető (dátum `ÉÉÉÉ-HH-NN`,
   `group`: `mindenkinek` vagy `szakmai` – az oldalon e szerint két csoportban jelennek meg).
 

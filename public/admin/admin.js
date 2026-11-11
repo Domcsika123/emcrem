@@ -53,9 +53,9 @@
 
   function errorText(err) {
     if (!navigator.onLine) return 'Nincs internetkapcsolat. Ellenőrizd a hálózatot, és próbáld újra.';
-    if (err.status === 401) return 'A belépőkulcs érvénytelen vagy lejárt. Hozz létre újat, és lépj be vele.';
-    if (err.status === 403) return 'A kulcsnak nincs jogosultsága ehhez. Ellenőrizd, hogy a „Contents” jog „Read and write”.';
-    if (err.status === 404) return 'A repó vagy az adatfájl nem található, vagy a kulcs nem fér hozzá a(z) „' + CFG.repo + '” repóhoz.';
+    if (err.status === 401) return 'A belépőkulcs érvénytelen vagy lejárt. Ellenőrizd, hogy az egészet másoltad-e be; ha így sem jó, kérj újat a weboldal készítőjétől.';
+    if (err.status === 403) return 'Ezzel a kulccsal nem lehet menteni. Kérj új kulcsot a weboldal készítőjétől.';
+    if (err.status === 404) return 'Ez a kulcs nem ehhez a weboldalhoz tartozik. Kérj új kulcsot a weboldal készítőjétől.';
     if (err.status === 409) return 'Közben valaki más is módosított. Frissítettem a listát – próbáld újra.';
     return 'Hiba történt: ' + escapeHtml(err.message);
   }
@@ -115,7 +115,10 @@
   }
   function huDate(iso) { return iso ? iso.replace(/-/g, '.') + '.' : ''; }
   function elapsed(t) { var s = Math.round((Date.now() - t) / 1000); return s < 60 ? s + ' mp' : Math.floor(s / 60) + ' perc ' + (s % 60) + ' mp'; }
-  function pressPageUrl() { return new URL('../erdekes-linkek-sajtofigyelo/', location.href).href; }
+  // Saving always publishes to the live site, so "view" links must point there even when the editor is opened from a local preview.
+  var IS_LOCAL = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname) || location.protocol === 'file:';
+  var LIVE_SITE = 'https://' + CFG.owner.toLowerCase() + '.github.io/' + CFG.repo + '/';
+  function pressPageUrl() { return IS_LOCAL ? LIVE_SITE + 'erdekes-linkek-sajtofigyelo/' : new URL('../erdekes-linkek-sajtofigyelo/', location.href).href; }
   function validUrl(u) { return /^https?:\/\/[^\s/]+\.[^\s]+$/i.test(u); }
 
   function sourceName(url) {
@@ -397,7 +400,8 @@
     if (e.target === f.label2) f.label2.dataset.auto = '';
     renderPreview();
   });
-  document.querySelectorAll('[data-repo]').forEach(function (n) { n.textContent = CFG.repo; });
+  $('view-site').href = pressPageUrl();
+  document.querySelectorAll('a[href="../erdekes-linkek-sajtofigyelo/"]').forEach(function (a) { a.href = pressPageUrl(); });
 
   var saved = readToken();
   if (saved) connect(saved); else showConnect();
