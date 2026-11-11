@@ -28,11 +28,12 @@ jobs:
         with:
           python-version: "3.12"
 
-      # Project site lives at https://<user>.github.io/<repo>/ and has no PHP.
-      # With a custom domain (public/CNAME), set SITE_BASE to "/".
+      # Served from the custom domain's root (Settings → Pages → Custom domain), no PHP.
+      # Without a custom domain (https://<user>.github.io/<repo>/) SITE_BASE would be
+      # /${{ github.event.repository.name }}/
       - name: Build
         env:
-          SITE_BASE: /${{ github.event.repository.name }}/
+          SITE_BASE: /
           FORM_MODE: mailto
         run: |
           python build.py

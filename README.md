@@ -9,7 +9,7 @@
 - `.github/workflows/pages.yml` – automatikus közzététel GitHub Pages-re.
 
 ## Sajtófigyelő admin (`/admin/`)
-- Cím: https://domcsika123.github.io/emcrem/admin/ (saját domainen: `/admin/`)
+- Cím: https://emcremdefibrillator.hu/admin/
 - Új cikk / videó felvétele, szerkesztése, törlése pár kattintással; előnézettel. A „Közzététel” a
   `content/sajtofigyelo.json` fájlt menti a repóba, amire a GitHub Pages pár percen belül frissül.
 - Belépés: a szerkesztő (ügyfél) a fejlesztőtől kapott belépőkulcsot illeszti be; a belépő oldal ezt kéri.
@@ -27,12 +27,13 @@
 4. Commit + push a `main` ágra → a GitHub Pages pár percen belül frissül.
 
 ## GitHub Pages
-- Cím: https://domcsika123.github.io/emcrem/
-- Egyszeri beállítás: a repó **Settings → Pages → Build and deployment → Source: GitHub Actions**.
-- A munkafolyamat `SITE_BASE=/emcrem/` értékkel generál (almappás cím), és `FORM_MODE=mailto` módban:
+- Cím: https://emcremdefibrillator.hu/ (a régi https://domcsika123.github.io/emcrem/ cím ide irányít át)
+- Egyszeri beállítás: a repó **Settings → Pages → Build and deployment → Source: GitHub Actions**,
+  ugyanitt **Custom domain: emcremdefibrillator.hu**; a domain DNS-ében a GitHub Pages rekordjai.
+  `public/CNAME` fájl nem kell: Actions-ös közzétételnél a GitHub a domaint a Pages beállításból veszi.
+- A munkafolyamat `SITE_BASE=/` értékkel generál (a domain gyökerébe), és `FORM_MODE=mailto` módban:
   mivel a Pages nem futtat PHP-t, az űrlap a látogató levelezőprogramjában nyit egy kitöltött levelet.
-- Saját domainre (emcremdefibrillator.hu) váltáskor: `public/CNAME` fájl a domainnel, a munkafolyamatban
-  `SITE_BASE: /`, a domain DNS-ében pedig a GitHub Pages rekordjai.
+- Ha az oldal visszakerülne a domain nélküli, almappás címre, a munkafolyamatban `SITE_BASE: /emcrem/` kell.
 
 ## Élesítés előtt
 - Az adatkezelési tájékoztató sárgával jelölt `[kitöltendő]` részeinek kitöltése (cégjegyzékszám, adószám, tárhelyszolgáltató, megőrzési idő), jogi átnézés.
