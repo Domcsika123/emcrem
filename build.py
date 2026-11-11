@@ -9,6 +9,7 @@ Környezeti változók (a GitHub Pages munkafolyamat használja):
   SITE_BASE=/emcrem/   ha az oldal almappában fut (pl. felhasznalo.github.io/emcrem/)
   FORM_MODE=mailto     ha nincs PHP: az űrlap a látogató levelezőjében nyit új levelet
 """
+import hashlib
 import html
 import json
 import os
@@ -17,10 +18,16 @@ from pathlib import Path
 
 ROOT = Path(__file__).parent / "public"
 SITE = "https://emcremdefibrillator.hu"
-LASTMOD = "2026-10-21"
+LASTMOD = "2026-11-11"
+PRIVACY_DATE = "2026-10-21"  # az adatkezelési tájékoztató hatálybalépése
 _base = os.environ.get("SITE_BASE", "").strip("/")
 BASE = f"/{_base}/" if _base else "/"
 FORM_MAILTO = os.environ.get("FORM_MODE") == "mailto"
+
+
+def asset_ver(rel):
+    """A fájl tartalmából képzett verzió: ha a CSS/JS változik, a böngésző biztosan az újat tölti le (nem a gyorsítótárból)."""
+    return hashlib.sha1((ROOT / rel).read_bytes()).hexdigest()[:10]
 
 ORG = {
     "name": "Emcrem Kft.",
@@ -44,19 +51,25 @@ IMGS = {
     "aed-3100-nyitott-fedellel": (800, 800, [800, 480]),
     "aed-3100-hordtaska": (800, 800, [800, 480]),
     "aed-fali-tarolo-szekreny": (800, 800, [800, 480]),
+    "aed-3100-elektrodakkal": (619, 349, [619]),
+    "aed-3100-gyermek-paciensek": (706, 397, [706]),
+    "aed-fali-tarolo-sportletesitmenyben": (346, 195, [346]),
+    "aed-kerek-fali-tarolo": (310, 310, [310]),
+    "cardiolife-ems-mentoben": (607, 342, [607]),
     "munkahelyi-elsosegely-oktatas": (500, 334, [500]),
     "automata-defibrillator-csalad": (500, 257, [500]),
     "oktatas-extrak": (500, 449, [500]),
     "szakmai-felhasznaloknak": (500, 333, [500]),
-    "lifeline-arm-mellkaskompresszios-keszulek": (800, 800, [800, 480]),
-    "lifeline-arm-oldalnezet": (800, 800, [800, 480]),
-    "lifeline-arm-hordtaska": (800, 800, [800, 480]),
-    "lifeline-arm-hasznalat-kozben": (1694, 800, [1200, 640]),
+    "arm-xr-mellkaskompresszios-rendszer": (413, 500, [413]),
+    "arm-xr-oldalnezet": (413, 500, [413]),
+    "arm-xr-rogzitopantokkal": (413, 500, [413]),
     "cpr-assist-mellkaskompresszio-ellenorzo": (800, 800, [800, 480]),
     "cpr-assist-hasznalat-kozben": (800, 592, [800, 480]),
-    "nihon-kohden-tec-5600-defibrillator-monitor": (800, 800, [800, 480]),
-    "nihon-kohden-tec-5600-allvanyon": (800, 800, [800, 480]),
-    "nihon-kohden-tec-5600-korhazi-hasznalat": (800, 800, [800, 480]),
+    "nihon-kohden-tec-1000-defibrillator-monitor": (800, 623, [800, 480]),
+    "nihon-kohden-tec-1000-kocsin": (600, 988, [600, 360]),
+    "cardiolife-ems-1052-elolnezet": (800, 417, [800, 480]),
+    "cardiolife-ems-1052-hatulnezet": (800, 534, [800, 480]),
+    "cardiolife-ems-1052-oldalnezet": (480, 437, [480]),
 }
 
 ICONS = {
@@ -327,7 +340,7 @@ def page(path, title, desc, body, current=None, schema=None, noindex=False,
 <link rel="manifest" href="/site.webmanifest">
 <link rel="preload" href="/assets/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/inter-latin-ext.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/assets/css/style.css?v={LASTMOD}">
+<link rel="stylesheet" href="/assets/css/style.css?v={asset_ver("assets/css/style.css")}">
 <script type="application/ld+json">
 {ld}
 </script>
@@ -338,7 +351,7 @@ def page(path, title, desc, body, current=None, schema=None, noindex=False,
 {body}
 </main>
 {footer()}
-<script src="/assets/js/main.js?v={LASTMOD}" defer></script>
+<script src="/assets/js/main.js?v={asset_ver("assets/js/main.js")}" defer></script>
 </body>
 </html>
 '''
@@ -424,8 +437,12 @@ def link_icon(url):
     return "news"
 
 
+PRESS_GROUPS = {"mindenkinek": "Mindenkinek", "szakmai": "Szakmai felhasználóknak"}
+
+
 def load_press():
-    """Sajtófigyelő bejegyzések a content/sajtofigyelo.json fájlból (ezt szerkeszti az /admin/ felület)."""
+    """Sajtófigyelő bejegyzések a content/sajtofigyelo.json fájlból (ezt szerkeszti az /admin/ felület).
+    Elem: (dátum, cím, leírás, linkek, csoport) – a csoport "mindenkinek" vagy "szakmai" (alapértelmezés: mindenkinek)."""
     items = []
     for it in json.loads(PRESS_FILE.read_text(encoding="utf-8")):
         date = str(it.get("date", ""))
@@ -433,7 +450,8 @@ def load_press():
         links = [(str(l.get("label") or "").strip() or l["url"].split("/")[2], l["url"], link_icon(l["url"]))
                  for l in it.get("links", []) if re.match(r"^https?://[^\s/]+", str(l.get("url", "")))]
         if re.match(r"^\d{4}-\d{2}-\d{2}$", date) and title and links:
-            items.append((date, title, str(it.get("summary", "")).strip(), links))
+            group = it.get("group") if it.get("group") in PRESS_GROUPS else "mindenkinek"
+            items.append((date, title, str(it.get("summary", "")).strip(), links, group))
     return sorted(items, key=lambda x: x[0], reverse=True)
 
 
@@ -444,16 +462,17 @@ def hu_date(iso):
     return iso.replace("-", ".") + "."
 
 
-def press_items(items, heading="h2"):
+def press_items(items, heading="h2", badges=False):
     out = []
-    for d, title, summary, links in items:
+    for d, title, summary, links, group in items:
         ls = "".join(
             f'<a class="press-link" href="{esc(u)}" target="_blank" rel="noopener">{esc(lbl)} {icon("external")}'
             f'<span class="visually-hidden"> (új lapon nyílik)</span></a>' for lbl, u, ic in links)
         summary_html = f"<p>{esc(summary)}</p>" if summary else ""
+        badge = '<span class="press-badge">Szakmai</span> ' if badges and group == "szakmai" else ""
         out.append(f"""<li class="press-item">
   <time datetime="{d}">{hu_date(d)}</time>
-  <div><{heading}>{esc(title)}</{heading}>{summary_html}</div>
+  <div><{heading}>{badge}{esc(title)}</{heading}>{summary_html}</div>
   <div class="press-links">{ls}</div>
 </li>""")
     return f'<ul class="press-list">{"".join(out)}</ul>'
@@ -464,6 +483,8 @@ AED_FAQ = [
      "Az AED-3100 automata defibrillátor ára 580.000 Ft + ÁFA. Kompletten, üzemkészen szállítjuk, teleppel és elektródával."),
     ("Mit kapok a defibrillátor mellé?",
      "A megrendelőnek ingyen biztosítunk egy újraélesztő tanfolyamot (az AED-3100 saját gyakorló defibrillátorával, számítógépes értékelésű szimulációs eszközökkel), vagy egy teljes körű munkahelyi elsősegély-tanfolyamot legfeljebb 20 fő részére."),
+    ("Ki használhat AED készüléket?",
+     "AED készüléket bárki használhat, szükség esetén a lehető leghamarabb. Előzetes tréning – a magabiztosságot növelendő – hasznos."),
     ("Gyermekeknél is használható a készülék?",
      "Igen, az AED-3100 felnőtt és gyermek páciensek esetén is alkalmazható."),
     ("Milyen nyelven ad utasításokat a defibrillátor?",
@@ -471,7 +492,7 @@ AED_FAQ = [
     ("Mennyi a garancia, és hogyan ellenőrizhető az üzemkészség?",
      "A készülékre 8 év garanciát biztosítunk. Az AED naponta önellenőrzést (önteszt) végez, opcionálisan WiFi-alapú távfelügyelettel is kérhető."),
     ("Mennyi ideig tart és mennyibe kerül a munkahelyi elsősegély-oktatás?",
-     "A képzés a választott tematikától függően 4–8 óra. Ára 9.000 Ft/fő (minimum 5 fő). Automata defibrillátor vásárlása esetén legfeljebb 20 főig ingyenes."),
+     "A képzés a választott tematikától függően 4–8 óra. Ára 12.000 Ft/fő (minimum 5 fő). Automata defibrillátor vásárlása esetén legfeljebb 20 főig ingyenes."),
 ]
 
 
@@ -484,7 +505,7 @@ def build_home():
         ("/oktatas-extrak/", "oktatas-extrak", "Piros szív és sztetoszkóp",
          "Oktatás extrák", "Szimulációs „Éles helyzetben” tréning, gyermek-, középiskolai és angol nyelvű oktatás."),
         ("/szakmai-felhasznaloknak/", "szakmai-felhasznaloknak", "Mentők ellátják a sérültet",
-         "Szakmai felhasználóknak", "Lifeline ARM mellkaskompressziós készülék, CPR Assist és TEC-5600 manuális defibrillátor."),
+         "Szakmai felhasználóknak", "ARM XR mellkaskompressziós rendszer, TEC és cardiolife EMS defibrillátorok, CPR Assist."),
     ]
     cards = "".join(f'''<article class="card card--link reveal">
   <div class="card__media">{img(n, a, "(min-width: 1000px) 280px, (min-width: 640px) 50vw, 100vw")}</div>
@@ -495,25 +516,38 @@ def build_home():
   </div>
 </article>''' for h, n, a, t, d in services)
     faq_html, faq_ld = faq_block(AED_FAQ, soft=False)
-    body = f'''<section class="hero" aria-labelledby="hero-cim">
-  <div class="container hero-grid">
-    <div>
-      <p class="eyebrow">AED defibrillátorok Japánból</p>
+    def chips(links):
+        return "".join(f'<a href="{h}">{t} {icon("arrow")}</a>' for h, t in links)
+
+    public_chips = chips([("/automata-defibrillator/", "Automata defibrillátor"),
+                          ("/munkahelyi-elsosegely-oktatas/", "Munkahelyi oktatás"),
+                          ("/oktatas-extrak/", "Oktatás extrák")])
+    pro_chips = chips([(f"/szakmai-felhasznaloknak/#{a}", t) for a, t, _ in PRO_PRODUCTS])
+    body = f'''<section class="hero-split" aria-label="Kínálatunk">
+  <div class="container hero-split__grid">
+    <a class="hero-split__switch" href="#szakmai">{icon("steth")} Szakmai felhasználóknak {icon("chevron")}</a>
+    <article class="hero-card" aria-labelledby="hero-cim">
+      <a class="hero-card__media" href="/automata-defibrillator/" tabindex="-1" aria-hidden="true">{img("aed-3100-elektrodakkal", "", "(min-width: 960px) 580px, 100vw", eager=True)}</a>
+      <p class="eyebrow">Mindenkinek · AED Japánból</p>
       <h1 id="hero-cim">Automata defibrillátor és <span class="accent">elsősegély-oktatás</span> egy helyen</h1>
-      <p class="lead">Nihon Kohden AED-3100 automata defibrillátorok üzemkészen, valamint gyakorlatorientált munkahelyi és iskolai elsősegély-oktatás, sürgősségi ellátásban jártas oktatókkal.</p>
+      <p class="hero-card__lead">Nihon Kohden AED-3100 üzemkészen, valamint gyakorlatorientált munkahelyi és iskolai elsősegély-oktatás.</p>
       <div class="btn-row">
         <a class="btn btn--primary" href="/ajanlatkeres/">Ajánlatot kérek {icon("arrow", "icon--arrow")}</a>
         <a class="btn btn--secondary" href="/automata-defibrillator/">Az AED-3100 részletei</a>
       </div>
-      <ul class="hero-points">
-        <li>{icon("check")} 8 év garancia</li>
-        <li>{icon("check")} Magyar hangutasítás</li>
-        <li>{icon("check")} Ingyenes tanfolyam AED mellé</li>
-      </ul>
-    </div>
-    <div class="hero-visual">
-      <div class="hero-visual__img">{img("aed-3100-made-in-japan", "Nihon Kohden Cardiolife AED-3100 automata defibrillátor – Made in Japan", "(min-width: 960px) 520px, 90vw", eager=True)}</div>
-    </div>
+      <nav class="hero-card__links" aria-label="Laikus felhasználóknak">{public_chips}</nav>
+    </article>
+    <article class="hero-card hero-card--pro" id="szakmai" aria-labelledby="szakmai-hero-cim">
+      <a class="hero-card__media" href="/szakmai-felhasznaloknak/" tabindex="-1" aria-hidden="true">{img("cardiolife-ems-mentoben", "", "(min-width: 960px) 580px, 100vw", eager=True)}</a>
+      <p class="eyebrow">Prehospitális · Kórházi</p>
+      <h2 id="szakmai-hero-cim">Szakmai felhasználóknak</h2>
+      <p class="hero-card__lead">Professzionális újraélesztési eszközök mentőszolgálatok, kórházak és egészségügyi intézmények számára.</p>
+      <div class="btn-row">
+        <a class="btn" href="/szakmai-felhasznaloknak/">Szakmai eszközök {icon("arrow", "icon--arrow")}</a>
+        <a class="btn btn--secondary" href="/ajanlatkeres/?targy=szakmai">Szakmai ajánlatkérés</a>
+      </div>
+      <nav class="hero-card__links" aria-label="Szakmai termékek">{pro_chips}</nav>
+    </article>
   </div>
 </section>
 
@@ -568,7 +602,7 @@ def build_home():
       <ul class="checklist">
         <li>{icon("check")} Korszerű demonstrációs eszközök</li>
         <li>{icon("check")} 4–8 óra, a választott tematikától függően</li>
-        <li>{icon("check")} 9.000 Ft/fő (min. 5 fő) – AED vásárlása esetén ingyenes</li>
+        <li>{icon("check")} 12.000 Ft/fő (min. 5 fő) – AED vásárlása esetén ingyenes</li>
       </ul>
       <div class="btn-row">
         <a class="btn btn--primary" href="/ajanlatkeres/?targy=oktatas">Oktatást kérek {icon("arrow", "icon--arrow")}</a>
@@ -583,7 +617,7 @@ def build_home():
     <div class="section-head">
       <h2 id="sajto-cim">Érdekes linkek a témában</h2>
     </div>
-    {press_items(PRESS[:3], "h3")}
+    {press_items(PRESS[:3], "h3", badges=True)}
     <p style="margin-top:24px"><a class="link-arrow" href="/erdekes-linkek-sajtofigyelo/">Összes link {icon("arrow")}</a></p>
   </div>
 </section>
@@ -614,8 +648,11 @@ def build_aed():
         ("aed-3100-automata-defibrillator", "Nihon Kohden Cardiolife AED-3100 automata defibrillátor elölnézetből"),
         ("aed-3100-nyitott-fedellel", "AED-3100 nyitott fedéllel, elektródával és képes útmutatóval"),
         ("aed-3100-hordtaska", "AED-3100 narancssárga hordtáskában"),
-        ("aed-fali-tarolo-szekreny", "AED fali tárolószekrény ajtónyitásra megszólaló riasztóval"),
+        ("aed-3100-gyermek-paciensek", "AED-3100 – gyermek páciensek esetén is használható"),
         ("aed-3100-made-in-japan", "AED-3100 – Made in Japan"),
+        ("aed-fali-tarolo-szekreny", "AED fali tárolószekrény ajtónyitásra megszólaló riasztóval"),
+        ("aed-fali-tarolo-sportletesitmenyben", "AED kerek fali tárolóban egy sportlétesítményben"),
+        ("aed-kerek-fali-tarolo", "Kerek, átlátszó fedelű AED fali tároló"),
     ], "AED-3100 termékképek")
     specs = [
         ("users", "Felnőtt és gyermek páciensekhez"),
@@ -626,7 +663,7 @@ def build_aed():
         ("wifi", "WiFi-távfelügyelet (opcionális)"),
     ]
     spec_html = "".join(f'<li><span class="spec-icon">{icon(i)}</span>{t}</li>' for i, t in specs)
-    faq_html, faq_ld = faq_block(AED_FAQ[:5])
+    faq_html, faq_ld = faq_block(AED_FAQ[:-1])  # az oktatási kérdés nélkül
     product_ld = {
         "@type": "Product",
         "@id": SITE + "/automata-defibrillator/#product",
@@ -634,7 +671,7 @@ def build_aed():
         "model": "AED-3100",
         "brand": {"@type": "Brand", "name": "Nihon Kohden"},
         "image": [SITE + src_of("aed-3100-automata-defibrillator"), SITE + src_of("aed-3100-nyitott-fedellel"),
-                  SITE + src_of("aed-3100-hordtaska")],
+                  SITE + src_of("aed-3100-hordtaska"), SITE + src_of("aed-3100-gyermek-paciensek")],
         "description": "Automata külső defibrillátor (AED) felnőtt és gyermek páciensekhez, ActiBiphasic technológiával, magyar nyelvű hangutasításokkal, napi önteszttel és 8 év garanciával. Kompletten, üzemkészen, teleppel és elektródával.",
         "countryOfOrigin": "JP",
         "offers": {
@@ -700,7 +737,7 @@ def build_aed():
 def build_training():
     crumbs, bc = breadcrumbs([("Munkahelyi elsősegély-oktatás", "/munkahelyi-elsosegely-oktatas/")])
     why = [
-        ("cert", "Elfogadott tanúsítvány", "Munkahelyek számára kötelező képzés, amely az OMMF által elfogadott tanúsítványt is nyújt."),
+        ("cert", "Elfogadott tanúsítvány", "Munkahelyek számára kötelező képzés, amely a Munkavédelmi Hatóság által elfogadott tanúsítványt is nyújt."),
         ("heart", "Gyakorlatorientált", "Korszerű demonstrációs eszközök, a komplex helyzetkezelésre felkészítő oktatás."),
         ("steth", "Tapasztalt oktatók", "A sürgősségi ellátásban jártassággal rendelkező oktatók."),
     ]
@@ -713,8 +750,8 @@ def build_training():
         "description": "Munkahelyek számára kötelező, gyakorlatorientált elsősegély-képzés tanúsítvánnyal, korszerű demonstrációs eszközökkel, sürgősségi ellátásban jártas oktatókkal. Időtartam: 4–8 óra.",
         "inLanguage": "hu",
         "provider": {"@id": SITE + "/#org"},
-        "offers": {"@type": "Offer", "category": "Paid", "price": "9000", "priceCurrency": "HUF",
-                   "priceSpecification": {"@type": "UnitPriceSpecification", "price": "9000", "priceCurrency": "HUF",
+        "offers": {"@type": "Offer", "category": "Paid", "price": "12000", "priceCurrency": "HUF",
+                   "priceSpecification": {"@type": "UnitPriceSpecification", "price": "12000", "priceCurrency": "HUF",
                                           "referenceQuantity": {"@type": "QuantitativeValue", "value": 1, "unitText": "fő"}}},
         "hasCourseInstance": {"@type": "CourseInstance", "courseMode": "Onsite", "courseWorkload": "PT4H"},
     }
@@ -737,15 +774,13 @@ def build_training():
     <div>
       <h2 id="tartalom-cim">Minden képzés tartalmazza</h2>
       <ul class="checklist">
-        <li>{icon("check")} Alapvető járványtani ismeretek</li>
-        <li>{icon("check")} A megelőzés aktuális kérdései</li>
-        <li>{icon("check")} Infekciókontroll</li>
-        <li>{icon("check")} Személyes higiénia a gyakorlatban</li>
+        <li>{icon("check")} Alapfokú újraélesztés AED használattal</li>
       </ul>
+      <p class="mb-0">Modulokra épülő tematika, igény szerint az adott munkahely sajátosságaihoz igazítva.</p>
     </div>
     <div class="info-cards" style="grid-template-columns:1fr">
       <div class="info-card"><span class="feature-icon">{icon("clock")}</span><span class="info-card__label">Időtartam</span><span class="info-card__value">4–8 óra <small>a választott tematikától függően</small></span></div>
-      <div class="info-card"><span class="feature-icon">{icon("users")}</span><span class="info-card__label">Ár</span><span class="info-card__value">9.000 Ft/fő <small>(min. 5 fő)</small></span></div>
+      <div class="info-card"><span class="feature-icon">{icon("users")}</span><span class="info-card__label">Ár</span><span class="info-card__value">12.000 Ft/fő <small>(min. 5 fő)</small></span></div>
       <div class="info-card info-card--highlight"><span class="feature-icon">{icon("gift")}</span><span class="info-card__label">Automata defibrillátor vásárlása esetén</span><span class="info-card__value">Ingyenes – max. 20 főig <small><a href="/automata-defibrillator/">AED-3100 →</a></small></span></div>
     </div>
   </div>
@@ -753,7 +788,7 @@ def build_training():
 
 {cta_band("Szervezzen oktatást a munkahelyén", "Írja meg a létszámot és az időpont-elképzelést, és összeállítjuk a megfelelő tematikát.")}'''
     return page("/munkahelyi-elsosegely-oktatas/", "Munkahelyi elsősegély-oktatás tanúsítvánnyal | Emcrem",
-                "Kötelező munkahelyi elsősegély-oktatás tanúsítvánnyal, 4–8 órában, sürgősségi ellátásban jártas oktatókkal. 9.000 Ft/fő, AED vásárlásakor ingyenes.",
+                "Kötelező munkahelyi elsősegély-oktatás tanúsítvánnyal, 4–8 órában, sürgősségi ellátásban jártas oktatókkal. 12.000 Ft/fő, AED vásárlásakor ingyenes.",
                 body, schema=[bc, course_ld])
 
 
@@ -765,9 +800,9 @@ def build_extras():
          "<p>A szimuláció a sebzések, sérülések, váratlan tünetek élethű megjelenítésétől a több sérültes balesetig terjedhet.</p>",
          ["Megrendelés előtt előzetes egyeztetés szükséges"]),
         ("smile", "orange", "Elsősegély-oktatás gyermekeknek",
-         "<p>Általános iskolásoknak, életkor szerinti csoportbontásban. Kis létszámú csoportfoglalkozás, melynek célja a potenciális veszélyek, veszélyhelyzetek felismerése és kezelése az életkori sajátosságok figyelembevételével. A módszertant szituációs gyakorlatok, játékos feladatok alkotják.</p>"
+         "<p>Kis létszámú csoportfoglalkozás, melynek célja a potenciális veszélyek, veszélyhelyzetek felismerése és kezelése az életkori sajátosságok figyelembevételével. A módszertant szituációs gyakorlatok, játékos feladatok alkotják.</p>"
          "<p>A foglalkozást két fő, egy pszichológus és egy orvos vezeti.</p>",
-         ["2 × 45 perc", "Max. 12 fő", "Pszichológus + orvos"]),
+         ["2 × 45 perc", "Max. 12 fő", "Pszichológus + orvos", "Megrendelés előtt előzetes egyeztetés szükséges"]),
         ("book", "", "Középiskolai elsősegély-oktatás",
          "<p>Órarendbe illesztetten vagy azon kívül, szaktanár vezetésével.</p>", ["Órarendbe illeszthető"]),
         ("steth", "green", "Egészségügyi szakmai oktatás",
@@ -798,10 +833,19 @@ def build_extras():
                 body, schema=[bc])
 
 
+# A szakmai termékek: (horgony, rövid név, egysoros leírás) – a kezdőlap jobb oldala és az oldal ugrólinkjei is ebből épülnek.
+PRO_PRODUCTS = [
+    ("arm-xr", "ARM XR", "Automatikus mellkaskompressziós rendszer"),
+    ("tec", "TEC sorozat", "Manuális defibrillátor és monitor"),
+    ("cardiolife-ems", "cardiolife EMS", "Prehospitális monitor-defibrillátor"),
+    ("cpr-assist", "CPR Assist", "A mellkaskompresszió minőségének ellenőrzése"),
+]
+
+
 def build_pro():
     crumbs, bc = breadcrumbs([("Szakmai felhasználóknak", "/szakmai-felhasznaloknak/")])
 
-    def product(pid, eyebrow, title, desc_html, gal, url, reverse=False):
+    def product(pid, title, desc_html, gal, url, reverse=False):
         return f'''<article class="pro-product split{" split--reverse" if reverse else ""}" id="{pid}" aria-labelledby="{pid}-cim">
   <div>{gal}</div>
   <div>
@@ -814,40 +858,58 @@ def build_pro():
   </div>
 </article>'''
 
-    p1 = product("lifeline-arm", "Mellkaskompresszió", "Lifeline ARM mellkaskompressziós készülék",
-                 '<p class="lead">Automatikus mellkaskompressziós készülék a folyamatos, egyenletes újraélesztéshez.</p>',
-                 gallery([("lifeline-arm-mellkaskompresszios-keszulek", "Lifeline ARM mellkaskompressziós készülék"),
-                          ("lifeline-arm-oldalnezet", "Lifeline ARM oldalnézetből"),
-                          ("lifeline-arm-hordtaska", "Lifeline ARM piros hordtáskában"),
-                          ("lifeline-arm-hasznalat-kozben", "Lifeline ARM használat közben a páciens mellkasán")],
-                         "Lifeline ARM képek"),
-                 "https://eu.nihonkohden.com/products/resuscitation/lifeline-arm")
-    p2 = product("cpr-assist", "CPR-minőség", "CPR Assist",
+    def checks(*items):
+        return '<ul class="checklist">' + "".join(f"<li>{icon('check')} {t}</li>" for t in items) + "</ul>"
+
+    p1 = product("arm-xr", "ARM XR mellkaskompressziós rendszer",
+                 '<p class="lead">Automatikus mellkaskompressziós rendszer a folyamatos, minőségi újraélesztéshez – kórházon kívül és belül, szállítás közben is. <span class="text-muted">(Korábbi nevén Lifeline ARM.)</span></p>'
+                 + checks("Gyors felhelyezés könnyű vázzal és integrált hátlappal",
+                          "Akár 60 perc folyamatos működés egy akkumulátorral",
+                          "Rögzítőpántok a biztonságos betegszállításhoz",
+                          "A tapadókorong akár 1,5 cm mellkasi visszarugózást is támogat"),
+                 gallery([("arm-xr-mellkaskompresszios-rendszer", "ARM XR automatikus mellkaskompressziós rendszer elölnézetből"),
+                          ("arm-xr-oldalnezet", "ARM XR oldalnézetből"),
+                          ("arm-xr-rogzitopantokkal", "ARM XR rögzítőpántokkal")], "ARM XR képek"),
+                 "https://eu.nihonkohden.com/products/resuscitation/ARM-XR")
+    p2 = product("tec", "Manuális defibrillátor és monitor – Nihon Kohden „TEC” sorozat",
+                 '<p class="lead">A cardiolife TEC-1000 professzionális defibrillátor a gyors, biztonságos és megbízható újraélesztésért.</p>'
+                 + checks("AED, manuális defibrillálás, szinkronizált kardioverzió, noninvazív pacemaker és monitorozás",
+                          "10,4 hüvelykes érintőképernyő, 1-2-3 lépéses kezelés vezérlőtárcsával",
+                          "150 J töltés kevesebb mint 3 másodperc alatt",
+                          "Állapotjelző a napi és havi önteszt eredményével"),
+                 gallery([("nihon-kohden-tec-1000-defibrillator-monitor", "Nihon Kohden cardiolife TEC-1000 manuális defibrillátor és monitor"),
+                          ("nihon-kohden-tec-1000-kocsin", "TEC-1000 defibrillátor gurulós állványon")], "TEC sorozat képek"),
+                 "https://eu.nihonkohden.com/products/resuscitation/cardiolife-TEC-1000", reverse=True)
+    p3 = product("cardiolife-ems", "cardiolife EMS (EMS-1052)",
+                 '<p class="lead">Prehospitális professzionizmus – könnyű, kompakt monitor-defibrillátor a gyors sürgősségi ellátáshoz.</p>'
+                 + checks("Mindössze 4,2 kg, IP55 védettség, 1,22 m-es ejtésteszt",
+                          "Bekapcsolás után 4 másodperc alatt üzemkész",
+                          "EKG, SpO₂, kapnográfia, NIBP és 18 elvezetéses EKG (synECi18)",
+                          "Manuális és AED mód, szinkronizált kardioverzió, külső pacemaker"),
+                 gallery([("cardiolife-ems-1052-elolnezet", "Nihon Kohden cardiolife EMS-1052 monitor-defibrillátor elölnézetből"),
+                          ("cardiolife-ems-mentoben", "cardiolife EMS hordágyon, a sürgősségi osztály bejárata előtt"),
+                          ("cardiolife-ems-1052-oldalnezet", "cardiolife EMS-1052 oldalnézetből, hordtáskában"),
+                          ("cardiolife-ems-1052-hatulnezet", "cardiolife EMS-1052 hátulnézetből, vállpánttal")], "cardiolife EMS képek"),
+                 "https://eu.nihonkohden.com/products/resuscitation/cardiolife-ems")
+    p4 = product("cpr-assist", "CPR Assist",
                  '<p class="lead">A folyamatos és minőségi mellkaskompressziót ellenőrző eszköz.</p>'
-                 f'<ul class="checklist"><li>{icon("check")} Éles helyzetben is alkalmazható</li><li>{icon("check")} Képzés során is használható</li></ul>',
+                 + checks("Éles helyzetben is alkalmazható", "Képzés során is használható"),
                  gallery([("cpr-assist-mellkaskompresszio-ellenorzo", "Nihon Kohden CPR Assist mellkaskompresszió-ellenőrző eszköz"),
                           ("cpr-assist-hasznalat-kozben", "CPR Assist használat közben újraélesztéskor")], "CPR Assist képek"),
                  "https://eu.nihonkohden.com/products/resuscitation/cpr-assist", reverse=True)
-    p3 = product("tec-5600", "Manuális defibrillátor", "Manuális defibrillátor és monitor – Nihon Kohden TEC-5600 sorozat",
-                 '<p class="lead">Elérhető típusok:</p><ul class="model-list"><li>TEC-5621 K</li><li>TEC-5631 K</li></ul>'
-                 f'<ul class="checklist"><li>{icon("check")} Opcionális külső pacemaker (PM) funkcióval</li></ul>',
-                 gallery([("nihon-kohden-tec-5600-defibrillator-monitor", "Nihon Kohden Cardiolife TEC-5600 manuális defibrillátor és monitor"),
-                          ("nihon-kohden-tec-5600-allvanyon", "TEC-5600 defibrillátor gurulós állványon"),
-                          ("nihon-kohden-tec-5600-korhazi-hasznalat", "TEC-5600 defibrillátor kórházi használat közben")], "TEC-5600 képek"),
-                 "https://eu.nihonkohden.com/products/resuscitation/cardiolife-tec-8300")
     items = [
-        ("Lifeline ARM mellkaskompressziós készülék", "lifeline-arm-mellkaskompresszios-keszulek"),
+        ("ARM XR mellkaskompressziós rendszer", "arm-xr-mellkaskompresszios-rendszer"),
+        ("Nihon Kohden cardiolife TEC-1000 manuális defibrillátor és monitor", "nihon-kohden-tec-1000-defibrillator-monitor"),
+        ("Nihon Kohden cardiolife EMS (EMS-1052) monitor-defibrillátor", "cardiolife-ems-1052-elolnezet"),
         ("CPR Assist", "cpr-assist-mellkaskompresszio-ellenorzo"),
-        ("Nihon Kohden TEC-5600 manuális defibrillátor és monitor", "nihon-kohden-tec-5600-defibrillator-monitor"),
     ]
     list_ld = {"@type": "ItemList", "itemListElement": [
         {"@type": "ListItem", "position": i + 1,
          "item": {"@type": "Product", "name": n, "image": SITE + src_of(im), "brand": {"@type": "Brand", "name": "Nihon Kohden"}}}
         for i, (n, im) in enumerate(items)]}
-    jump = "".join(f'<a href="#{a}">{t}</a>' for a, t in
-                   [("lifeline-arm", "Lifeline ARM"), ("cpr-assist", "CPR Assist"), ("tec-5600", "TEC-5600")])
+    jump = "".join(f'<a href="#{a}">{t}</a>' for a, t, _ in PRO_PRODUCTS)
     body = f'''{page_hero(crumbs, "Egészségügyi szakembereknek", "Szakmai felhasználóknak",
-                     "Professzionális újraélesztési eszközök mentőszolgálatok, kórházak és egészségügyi intézmények számára – közvetlen kapcsolattal a gyártóhoz.",
+                     "Professzionális újraélesztési eszközök a prehospitális és a kórházi ellátás számára – mentőszolgálatoknak, kórházaknak és egészségügyi intézményeknek, közvetlen kapcsolattal a gyártóhoz.",
                      img("szakmai-felhasznaloknak", "Mentőápolók ellátják a hordágyon fekvő sérültet", "(min-width: 960px) 460px, 100vw", eager=True),
                      f'<nav aria-label="Termékek az oldalon" class="jump-links">{jump}</nav>')}
 
@@ -856,12 +918,13 @@ def build_pro():
     {p1}
     {p2}
     {p3}
+    {p4}
   </div>
 </section>
 
 {cta_band("Szakmai ajánlatot kér?", "Mentőszolgálatok, kórházak és intézmények számára egyedi ajánlatot készítünk.")}'''
-    return page("/szakmai-felhasznaloknak/", "Lifeline ARM, CPR Assist, TEC-5600 defibrillátor | Emcrem",
-                "Szakmai újraélesztési eszközök: Lifeline ARM mellkaskompressziós készülék, CPR Assist és Nihon Kohden TEC-5600 manuális defibrillátor és monitor.",
+    return page("/szakmai-felhasznaloknak/", "ARM XR, TEC, cardiolife EMS, CPR Assist | Emcrem",
+                "Szakmai újraélesztési eszközök: ARM XR mellkaskompressziós rendszer, Nihon Kohden TEC manuális defibrillátor és monitor, cardiolife EMS monitor-defibrillátor és CPR Assist.",
                 body, schema=[bc, list_ld])
 
 
@@ -892,7 +955,7 @@ def build_quote():
               <option value="aed">Automata defibrillátor (AED-3100)</option>
               <option value="oktatas">Munkahelyi elsősegély-oktatás</option>
               <option value="extrak">Oktatás extrák (szimuláció, iskola, angol nyelvű)</option>
-              <option value="szakmai">Szakmai eszközök (Lifeline ARM, CPR Assist, TEC-5600)</option>
+              <option value="szakmai">Szakmai eszközök (ARM XR, TEC, cardiolife EMS, CPR Assist)</option>
               <option value="egyeb">Egyéb kérdés</option>
             </select></div>
           <div class="field"><label for="letszam">Létszám <span class="hint">(oktatás esetén)</span></label><input id="letszam" name="letszam" type="number" min="1" max="999" inputmode="numeric"></div>
@@ -970,17 +1033,24 @@ def build_contact():
 def build_press():
     crumbs, bc = breadcrumbs([("Érdekes linkek, sajtófigyelő", "/erdekes-linkek-sajtofigyelo/")])
     list_ld = {"@type": "ItemList", "itemListElement": [
-        {"@type": "ListItem", "position": i + 1, "name": t, "url": links[0][1]} for i, (d, t, s, links) in enumerate(PRESS)]}
+        {"@type": "ListItem", "position": i + 1, "name": t, "url": links[0][1]} for i, (d, t, s, links, g) in enumerate(PRESS)]}
+    groups = [(key, label, [it for it in PRESS if it[4] == key]) for key, label in PRESS_GROUPS.items()]
+    jump = "".join(f'<a href="#{k}">{lbl} <span class="text-muted">({len(its)})</span></a>' for k, lbl, its in groups if its)
+    sections = "".join(f'''<section class="press-group" id="{k}" aria-labelledby="{k}-cim">
+      <h2 id="{k}-cim" class="press-group__title">{lbl}</h2>
+      {press_items(its, "h3")}
+    </section>''' for k, lbl, its in groups if its)
     body = f'''<section class="page-hero" style="padding-bottom:clamp(32px,4vw,48px)">
   <div class="container">
     {crumbs}
     <h1>Érdekes linkek, sajtófigyelő</h1>
-    <p class="lead mb-0">Válogatott cikkek és videók az újraélesztésről, a defibrillátorokról és az elsősegélynyújtásról.</p>
+    <p class="lead">Válogatott cikkek és videók az újraélesztésről, a defibrillátorokról és az elsősegélynyújtásról.</p>
+    <nav class="jump-links" aria-label="Csoportok">{jump}</nav>
   </div>
 </section>
 <section class="section" style="padding-top:clamp(32px,4vw,56px)" aria-label="Linkek">
   <div class="container">
-    {press_items(PRESS)}
+    {sections}
   </div>
 </section>
 {cta_band()}'''
@@ -996,7 +1066,7 @@ def build_privacy():
   <div class="container">
     {crumbs}
     <h1>Adatkezelési tájékoztató</h1>
-    <p class="lead mb-0">Hatályos: {hu_date(LASTMOD)}</p>
+    <p class="lead mb-0">Hatályos: {hu_date(PRIVACY_DATE)}</p>
   </div>
 </section>
 <section class="section" style="padding-top:clamp(32px,4vw,56px)">

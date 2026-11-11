@@ -15,7 +15,8 @@
 - Belépés: egyszer kell egy GitHub *fine-grained* token (Settings → Developer settings → Fine-grained tokens),
   csak az `emcrem` repóhoz, **Contents: Read and write** (+ **Actions: Read-only**, hogy látszódjon a közzététel állapota).
   A token csak a böngészőben tárolódik; a „Kijelentkezés” törli.
-- A bejegyzések a `content/sajtofigyelo.json` fájlban vannak; kézzel is szerkeszthető (dátum `ÉÉÉÉ-HH-NN`).
+- A bejegyzések a `content/sajtofigyelo.json` fájlban vannak; kézzel is szerkeszthető (dátum `ÉÉÉÉ-HH-NN`,
+  `group`: `mindenkinek` vagy `szakmai` – az oldalon e szerint két csoportban jelennek meg).
 
 ## Módosítás
 1. Szöveg / ár / elérhetőség: `build.py` (a cég adatai az `ORG` blokkban).

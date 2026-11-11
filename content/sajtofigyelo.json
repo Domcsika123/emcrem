@@ -1,6 +1,67 @@
 [
   {
+    "date": "2026-10-16",
+    "group": "szakmai",
+    "title": "Saving a Life Is Never Just One Action – World Restart a Heart Day 2026 (angol nyelvű)",
+    "summary": "A Nihon Kohden cikke a túlélési láncról: korai felismerés, újraélesztés, defibrilláció és emelt szintű ellátás.",
+    "links": [
+      {
+        "label": "Nihon Kohden",
+        "url": "https://eu.nihonkohden.com/news-and-events/World-Restart-a-Heart-Day-2026"
+      }
+    ]
+  },
+  {
+    "date": "2026-08-25",
+    "group": "szakmai",
+    "title": "Better Data, Better Decision – TOF-monitorozás a klinikai munkafolyamatban",
+    "summary": "A Nihon Kohden szakmai előadása a neuromuszkuláris (TOF) monitorozásról (angol nyelvű).",
+    "links": [
+      {
+        "label": "YouTube-videó",
+        "url": "https://www.youtube.com/watch?v=SwToOcVT0Jk"
+      }
+    ]
+  },
+  {
+    "date": "2022-09-13",
+    "group": "mindenkinek",
+    "title": "Nihon Kohden cardiolife EMS – bemutatóvideó",
+    "summary": "A cardiolife EMS monitor-defibrillátor bemutatása (angol nyelvű).",
+    "links": [
+      {
+        "label": "YouTube-videó",
+        "url": "https://www.youtube.com/watch?v=1e4KKjecD4s"
+      }
+    ]
+  },
+  {
+    "date": "2022-09-12",
+    "group": "szakmai",
+    "title": "Újraélesztés AED segítségével – teljes videó instrukciókkal",
+    "summary": "Az újraélesztés és az automata defibrillátor használata lépésről lépésre (angol nyelvű).",
+    "links": [
+      {
+        "label": "YouTube-videó",
+        "url": "https://www.youtube.com/watch?v=Z-eHIVg-Xik"
+      }
+    ]
+  },
+  {
+    "date": "2022-04-01",
+    "group": "szakmai",
+    "title": "A kibővült Life Scope G sorozatú betegőrző monitorok",
+    "summary": "A Nihon Kohden Life Scope G betegőrző monitorcsaládjának bemutatása (angol nyelvű).",
+    "links": [
+      {
+        "label": "YouTube-videó",
+        "url": "https://www.youtube.com/watch?v=6ZnQaUt8Zd0"
+      }
+    ]
+  },
+  {
     "date": "2021-10-28",
+    "group": "mindenkinek",
     "title": "Mentőhívás, AED, felmérés",
     "summary": "Felmérés a mentőhívásról, az újraélesztésről és a laikus elsősegélynyújtásról.",
     "links": [
@@ -12,6 +73,7 @@
   },
   {
     "date": "2021-10-28",
+    "group": "mindenkinek",
     "title": "AED az életben! – Defibrillátorral mentettek életet egy debreceni tornateremben",
     "summary": "Valós eset arról, hogy egy helyben elérhető defibrillátor életet ment.",
     "links": [
@@ -23,6 +85,7 @@
   },
   {
     "date": "2021-07-18",
+    "group": "mindenkinek",
     "title": "Életmentő szülők",
     "summary": "Videó a laikus újraélesztésről.",
     "links": [
@@ -34,6 +97,7 @@
   },
   {
     "date": "2020-11-08",
+    "group": "mindenkinek",
     "title": "COVID napló – avagy ez történt, miután pozitív lett a tesztem",
     "summary": "Személyes beszámoló egy orvostanhallgató tollából.",
     "links": [
@@ -45,6 +109,7 @@
   },
   {
     "date": "2020-10-15",
+    "group": "mindenkinek",
     "title": "Ne parázz, sokkolj!",
     "summary": "Videó az automata defibrillátor használatáról.",
     "links": [
@@ -56,6 +121,7 @@
   },
   {
     "date": "2020-07-21",
+    "group": "mindenkinek",
     "title": "Defibrillation (angol nyelvű)",
     "summary": "A defibrilláció története és működése.",
     "links": [
@@ -67,6 +133,7 @@
   },
   {
     "date": "2020-07-21",
+    "group": "mindenkinek",
     "title": "Defibrillátor – mikor és hogyan kell használni?",
     "summary": "Gyakorlati útmutató a defibrillátor használatáról.",
     "links": [
@@ -82,6 +149,7 @@
   },
   {
     "date": "2020-07-21",
+    "group": "mindenkinek",
     "title": "Hirtelen szívhalál, automata defibrillátor",
     "summary": "Tájékoztató a hirtelen szívhalálról és az AED szerepéről.",
     "links": [

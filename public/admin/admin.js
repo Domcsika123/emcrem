@@ -6,6 +6,7 @@
   var CFG = { owner: 'Domcsika123', repo: 'emcrem', branch: 'main', path: 'content/sajtofigyelo.json' };
   var API = 'https://api.github.com/repos/' + CFG.owner + '/' + CFG.repo;
   var TOKEN_KEY = 'emcrem-admin-token';
+  var GROUPS = { mindenkinek: 'Mindenkinek', szakmai: 'Szakmai' };
 
   var state = { token: null, items: [], sha: null, editing: -1, busy: false, watch: 0 };
   var $ = function (id) { return document.getElementById(id); };
@@ -187,7 +188,11 @@
       body.appendChild(el('div', 'admin-item__title', it.title));
       var meta = (it.links || []).map(function (l) { return l.label || sourceName(l.url); }).join(' · ');
       if (it.summary) meta = it.summary + (meta ? ' — ' + meta : '');
-      body.appendChild(el('div', 'admin-item__meta', meta));
+      var metaRow = el('div', 'admin-item__meta');
+      var g = groupOf(it);
+      metaRow.appendChild(el('span', 'admin-badge admin-badge--' + g, GROUPS[g]));
+      metaRow.appendChild(document.createTextNode(' ' + meta));
+      body.appendChild(metaRow);
       var actions = el('div', 'admin-item__actions');
       var edit = el('button', 'admin-link-btn', 'Szerkesztés');
       edit.type = 'button';
@@ -208,6 +213,14 @@
   var f = {};
   ['url', 'title', 'summary', 'date', 'label', 'url2', 'label2'].forEach(function (k) { f[k] = $('f-' + k); });
 
+  function groupOf(it) { return it && GROUPS.hasOwnProperty(it.group) ? it.group : 'mindenkinek'; }
+  function groupInputs() { return document.querySelectorAll('input[name="group"]'); }
+  function selectedGroup() {
+    var v = 'mindenkinek';
+    groupInputs().forEach(function (r) { if (r.checked) v = r.value; });
+    return v;
+  }
+
   function setSecondLink(show) {
     $('second-link').hidden = !show;
     $('add-second').hidden = show;
@@ -225,6 +238,8 @@
     f.title.value = it ? it.title : '';
     f.summary.value = it ? it.summary || '' : '';
     f.date.value = it ? it.date : today();
+    var g = groupOf(it);
+    groupInputs().forEach(function (r) { r.checked = r.value === g; });
     f.label.dataset.auto = f.label2.dataset.auto = '';
     setSecondLink(!!links[1]);
     $('editor-title').textContent = it ? 'Bejegyzés szerkesztése' : 'Új bejegyzés';
@@ -256,7 +271,7 @@
     var u1 = f.url.value.trim(), u2 = f.url2.value.trim();
     if (u1) links.push({ label: f.label.value.trim() || sourceName(u1), url: u1 });
     if (u2) links.push({ label: f.label2.value.trim() || sourceName(u2), url: u2 });
-    return { date: f.date.value, title: f.title.value.trim(), summary: f.summary.value.trim(), links: links };
+    return { date: f.date.value, group: selectedGroup(), title: f.title.value.trim(), summary: f.summary.value.trim(), links: links };
   }
 
   function validate(item) {
@@ -272,7 +287,10 @@
     p.textContent = '';
     var time = el('time', '', huDate(it.date));
     var body = el('div');
-    body.appendChild(el('h3', it.title ? '' : 'is-empty', it.title || 'A bejegyzés címe'));
+    var h = el('h3', it.title ? '' : 'is-empty');
+    if (it.group === 'szakmai') { h.appendChild(el('span', 'press-badge', 'Szakmai')); h.appendChild(document.createTextNode(' ')); }
+    h.appendChild(document.createTextNode(it.title || 'A bejegyzés címe'));
+    body.appendChild(h);
     if (it.summary) body.appendChild(el('p', '', it.summary));
     var links = el('div', 'press-links');
     (it.links.length ? it.links : [{ label: 'forrás' }]).forEach(function (l) {

@@ -61,6 +61,16 @@ body.admin { background: var(--bg-soft); min-height: 100vh; }
 .admin-item__actions { display: flex; gap: 16px; }
 .admin-item.is-new { animation: admin-flash 2.4s ease; }
 @keyframes admin-flash { from { background: #e7f6ef; } to { background: #fff; } }
+.admin-choice { border: 0; margin: 0; padding: 0; min-width: 0; }
+.admin-choice legend { padding: 0; margin-bottom: 8px; font-weight: 600; font-size: .9375rem; color: var(--ink); }
+.admin-choice .admin-choice__opt { display: flex; margin: 0; gap: 10px; align-items: flex-start; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; cursor: pointer; font-size: .9375rem; }
+.admin-choice .admin-choice__opt + .admin-choice__opt { margin-top: 8px; }
+.admin-choice__opt input { margin-top: 3px; accent-color: var(--brand-600); }
+.admin-choice__opt strong { display: block; color: var(--navy-900); }
+.admin-choice__opt span { color: var(--muted); }
+.admin-choice__opt:has(input:checked) { border-color: var(--brand-600); background: var(--bg-tint); }
+.admin-badge { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: .75rem; font-weight: 700; background: var(--bg-soft); color: var(--muted); }
+.admin-badge--szakmai { background: var(--navy-900); color: #fff; }
 .admin-empty { padding: 28px 20px; text-align: center; color: var(--muted); }
 
 .admin-status { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; padding: 14px 18px; border-radius: var(--radius); font-weight: 600; font-size: .9688rem; background: #fff; border: 1px solid var(--line); }

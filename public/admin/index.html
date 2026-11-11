@@ -60,7 +60,7 @@
     <div class="admin-head">
       <div>
         <h1 id="app-title">Sajtófigyelő</h1>
-        <p class="text-muted mb-0">Az itt felvett cikkek és videók megjelennek az <a href="../erdekes-linkek-sajtofigyelo/" target="_blank" rel="noopener">Érdekes linkek</a> oldalon, a legújabb három a kezdőlapon is.</p>
+        <p class="text-muted mb-0">Az itt felvett cikkek és videók megjelennek az <a href="../erdekes-linkek-sajtofigyelo/" target="_blank" rel="noopener">Érdekes linkek</a> oldalon, a választott csoportban („Mindenkinek” vagy „Szakmai felhasználóknak”); a legújabb három a kezdőlapon is.</p>
       </div>
       <button id="new-btn" class="btn btn--primary" type="button">+ Új bejegyzés</button>
     </div>
@@ -82,6 +82,11 @@
             <label for="f-summary">Rövid leírás <span class="hint">(nem kötelező, 1 mondat)</span></label>
             <textarea id="f-summary" maxlength="240" rows="2" placeholder="Miről szól röviden?"></textarea>
           </div>
+          <fieldset class="field admin-choice">
+            <legend>Kinek szól? <span class="req" aria-hidden="true">*</span></legend>
+            <label class="admin-choice__opt"><input type="radio" name="group" value="mindenkinek" checked><span><strong>Mindenkinek</strong> laikusoknak is érthető</span></label>
+            <label class="admin-choice__opt"><input type="radio" name="group" value="szakmai"><span><strong>Szakmai</strong> egészségügyi szakembereknek</span></label>
+          </fieldset>
           <div class="admin-row">
             <div class="field">
               <label for="f-date">Dátum <span class="req" aria-hidden="true">*</span></label>
