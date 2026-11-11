@@ -7,6 +7,7 @@ A közös fejléc, lábléc, SEO meta és strukturált adatok itt, egy helyen m�
 
 Környezeti változók (a GitHub Pages munkafolyamat használja):
   SITE_BASE=/emcrem/   ha az oldal almappában fut (pl. felhasznalo.github.io/emcrem/)
+  FORM_ACTION=https://…/kuldes.php   ha az űrlapfeldolgozó máshol fut (alapértelmezés: /kuldes.php)
   FORM_MODE=mailto     ha nincs PHP: az űrlap a látogató levelezőjében nyit új levelet
 """
 import hashlib
@@ -23,6 +24,7 @@ PRIVACY_DATE = "2026-10-21"  # az adatkezelési tájékoztató hatálybalépése
 _base = os.environ.get("SITE_BASE", "").strip("/")
 BASE = f"/{_base}/" if _base else "/"
 FORM_MAILTO = os.environ.get("FORM_MODE") == "mailto"
+FORM_ACTION = os.environ.get("FORM_ACTION", "/kuldes.php")
 
 
 def asset_ver(rel):
@@ -942,7 +944,7 @@ def build_quote():
   <div class="container form-layout">
     <div class="form-card" id="urlap">
       <div class="alert alert--error" id="urlap-hiba" role="alert" hidden>{icon("alert")}<span></span></div>
-      <form id="ajanlatkero-urlap" action="/kuldes.php" method="post" accept-charset="UTF-8"{f' data-mailto="{o["email"]}"' if FORM_MAILTO else ""}>
+      <form id="ajanlatkero-urlap" action="{FORM_ACTION}" method="post" accept-charset="UTF-8"{f' data-mailto="{o["email"]}"' if FORM_MAILTO else ""}>
         <h2 class="visually-hidden">Ajánlatkérő űrlap</h2>
         <div class="form-grid">
           <div class="field"><label for="nev">Név <span class="req" aria-hidden="true">*</span></label><input id="nev" name="nev" type="text" autocomplete="name" required maxlength="120"></div>

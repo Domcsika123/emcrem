@@ -28,13 +28,14 @@ jobs:
         with:
           python-version: "3.12"
 
-      # Served from the custom domain's root (Settings → Pages → Custom domain), no PHP.
+      # Served from the custom domain's root (Settings → Pages → Custom domain). Pages has no PHP,
+      # so the quote form posts to kuldes.php hosted on a separate subdomain (FORM_ACTION).
       # Without a custom domain (https://<user>.github.io/<repo>/) SITE_BASE would be
       # /${{ github.event.repository.name }}/
       - name: Build
         env:
           SITE_BASE: /
-          FORM_MODE: mailto
+          FORM_ACTION: https://urlap.emcremdefibrillator.hu/kuldes.php
         run: |
           python build.py
           rm -f public/kuldes.php public/.htaccess

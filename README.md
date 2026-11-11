@@ -31,8 +31,11 @@
 - Egyszeri beállítás: a repó **Settings → Pages → Build and deployment → Source: GitHub Actions**,
   ugyanitt **Custom domain: emcremdefibrillator.hu**; a domain DNS-ében a GitHub Pages rekordjai.
   `public/CNAME` fájl nem kell: Actions-ös közzétételnél a GitHub a domaint a Pages beállításból veszi.
-- A munkafolyamat `SITE_BASE=/` értékkel generál (a domain gyökerébe), és `FORM_MODE=mailto` módban:
-  mivel a Pages nem futtat PHP-t, az űrlap a látogató levelezőprogramjában nyit egy kitöltött levelet.
+- A munkafolyamat `SITE_BASE=/` értékkel generál (a domain gyökerébe). Mivel a Pages nem futtat PHP-t,
+  az űrlap a `FORM_ACTION` címre küld: https://urlap.emcremdefibrillator.hu/kuldes.php (PHP-s tárhely, Dima),
+  ami küldés után visszairányít a weboldalra. Az ott futó fájl másolata a `public/kuldes.php`; ha módosul,
+  a tárhelyre külön fel kell tölteni. (`FORM_MODE: mailto` esetén az űrlap PHP nélkül, a látogató
+  levelezőprogramjában nyit egy kitöltött levelet.)
 - Ha az oldal visszakerülne a domain nélküli, almappás címre, a munkafolyamatban `SITE_BASE: /emcrem/` kell.
 
 ## Élesítés előtt

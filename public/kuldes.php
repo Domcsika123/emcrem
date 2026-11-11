@@ -7,6 +7,8 @@ declare(strict_types=1);
 
 const RECIPIENT = 'aed@emcrem.hu';
 const SENDER    = 'noreply@emcremdefibrillator.hu';
+// A weboldal címe: ide irányít vissza küldés után (az űrlapfeldolgozó külön aldomainen fut).
+const SITE      = 'https://emcremdefibrillator.hu';
 const TOPICS    = [
     'aed'     => 'Automata defibrillátor (AED-3100)',
     'oktatas' => 'Munkahelyi elsősegély-oktatás',
@@ -16,7 +18,7 @@ const TOPICS    = [
 ];
 
 function redirect(string $to): void {
-    header('Location: ' . $to, true, 303);
+    header('Location: ' . SITE . $to, true, 303);
     exit;
 }
 
