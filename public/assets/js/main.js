@@ -114,6 +114,37 @@
     }
   }
 
+  /* Home hero on mobile: tabs switch between the public and the professional card */
+  var tabs = document.querySelector('.hero-tabs');
+  if (tabs) {
+    var grid = tabs.parentNode;
+    var btns = [].slice.call(tabs.querySelectorAll('[role="tab"]'));
+    var mq = window.matchMedia('(max-width: 759px)');
+    var current = location.hash === '#szakmai' ? 1 : 0;
+    var show = function (i, focus) {
+      current = i;
+      btns.forEach(function (b, j) {
+        var on = j === i, panel = document.getElementById(b.getAttribute('aria-controls'));
+        b.setAttribute('aria-selected', on);
+        b.tabIndex = on ? 0 : -1;
+        panel.hidden = mq.matches && !on;
+        if (mq.matches) { panel.setAttribute('role', 'tabpanel'); panel.setAttribute('aria-labelledby', b.id); }
+        else { panel.removeAttribute('role'); panel.setAttribute('aria-labelledby', panel.querySelector('h1, h2').id); }
+      });
+      if (focus) btns[i].focus();
+    };
+    btns.forEach(function (b, i) {
+      b.addEventListener('click', function () { show(i); });
+      b.addEventListener('keydown', function (e) {
+        if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { e.preventDefault(); show(1 - i, true); }
+      });
+    });
+    tabs.hidden = false;
+    grid.classList.add('has-tabs');
+    show(current);
+    (mq.addEventListener ? mq.addEventListener.bind(mq, 'change') : mq.addListener.bind(mq))(function () { show(current); });
+  }
+
   /* Current year */
   document.querySelectorAll('[data-year]').forEach(function (el) { el.textContent = new Date().getFullYear(); });
 })();

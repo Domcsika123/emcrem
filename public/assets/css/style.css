@@ -240,7 +240,6 @@ strong { font-weight: 700; color: var(--navy-900); }
 .hero-card__links a { display: inline-flex; align-items: center; gap: 5px; text-decoration: none; white-space: nowrap; }
 .hero-card__links a:hover { text-decoration: underline; }
 .hero-card__links .icon { width: 15px; height: 15px; }
-.hero-split__switch { display: none; }
 @media (min-width: 760px) {
   .hero-split__grid { grid-template-columns: 1fr 1fr; gap: 0 clamp(16px, 2.5vw, 32px); }
 }
@@ -597,15 +596,26 @@ a.tag:hover { text-decoration: underline; }
   .footer-bottom { flex-direction: column; }
 }
 
-/* Mobile split hero: the cards stack; a shortcut on top jumps to the professional card */
+/* Mobile split hero: one card at a time, switched with tabs on top (without JS both cards stay visible, stacked) */
+.hero-tabs { display: none; }
 @media (max-width: 759px) {
-  .hero-split__switch { display: flex; align-items: center; gap: 8px; padding: 10px 14px; border-radius: 10px;
-    background: var(--navy-900); color: #fff; font-size: .9375rem; font-weight: 700; text-decoration: none; }
-  .hero-split__switch .icon { width: 18px; height: 18px; color: var(--brand); }
-  .hero-split__switch .icon:last-child { margin-left: auto; }
   .hero-split__grid { gap: 14px; }
   .hero-card { grid-row: auto; grid-template-rows: none; }
+  .hero-split__grid.has-tabs .hero-tabs { display: grid; }
+  .hero-tabs { grid-template-columns: 1fr 1.35fr; gap: 4px; padding: 4px; border-radius: 12px; background: #e2e8f0; }
+  .hero-tabs button { display: flex; align-items: center; justify-content: center; gap: 6px; min-height: 44px; padding: 8px 10px; border: 0; border-radius: 9px;
+    background: transparent; color: var(--navy-900); font: inherit; font-size: .9375rem; font-weight: 700; line-height: 1.2; cursor: pointer;
+    transition: background-color .2s, color .2s, box-shadow .2s; }
+  .hero-tabs .icon { width: 17px; height: 17px; flex: none; }
+  .hero-tabs button[aria-selected="true"] { background: #fff; box-shadow: 0 1px 3px rgba(11, 29, 54, .14); }
+  .hero-tabs #hero-tab-szakmai[aria-selected="true"] { background: var(--navy-900); color: #fff; }
+  .hero-tabs #hero-tab-szakmai[aria-selected="true"] .icon { color: var(--brand); }
+  .hero-tabs button:focus-visible { outline: 2px solid var(--brand-600); outline-offset: 2px; }
+  .has-tabs .hero-card[hidden] { display: none; }
+  .has-tabs .hero-card { animation: hero-tab-in .25s ease-out; }
 }
+@keyframes hero-tab-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .has-tabs .hero-card { animation: none; } }
 @media (max-width: 639px) {
   .hero-card h1, .hero-card h2 { font-size: clamp(1.45rem, 6.6vw, 1.75rem); }
   .hero-card .btn { min-height: 46px; padding-block: 10px; }

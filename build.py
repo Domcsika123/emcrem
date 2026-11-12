@@ -527,8 +527,11 @@ def build_home():
     pro_chips = chips([(f"/szakmai-felhasznaloknak/#{a}", t) for a, t, _ in PRO_PRODUCTS])
     body = f'''<section class="hero-split" aria-label="Kínálatunk">
   <div class="container hero-split__grid">
-    <a class="hero-split__switch" href="#szakmai">{icon("steth")} Szakmai felhasználóknak {icon("chevron")}</a>
-    <article class="hero-card" aria-labelledby="hero-cim">
+    <div class="hero-tabs" role="tablist" aria-label="Kinek szól az ajánlat?" hidden>
+      <button type="button" role="tab" id="hero-tab-laikus" aria-controls="laikus" aria-selected="true">Mindenkinek</button>
+      <button type="button" role="tab" id="hero-tab-szakmai" aria-controls="szakmai" aria-selected="false" tabindex="-1">{icon("steth")} Szakmai felhasználóknak</button>
+    </div>
+    <article class="hero-card" id="laikus" aria-labelledby="hero-cim">
       <a class="hero-card__media" href="/automata-defibrillator/" tabindex="-1" aria-hidden="true">{img("aed-3100-elektrodakkal", "", "(min-width: 760px) 584px, 100vw", eager=True)}</a>
       <p class="eyebrow">Mindenkinek · AED Japánból</p>
       <h1 id="hero-cim">Automata defibrillátor és <span class="accent">elsősegély-oktatás</span> egy helyen</h1>
